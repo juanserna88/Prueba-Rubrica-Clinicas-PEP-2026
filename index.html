@@ -749,11 +749,18 @@ async function enviarReporte() {
   if (!data.emailEstudiante) { alert('⚠ Ingresa el email del estudiante.'); return; }
   const payload = { action: 'sendAndRegister', sheetId, ...data };
   const btn = event.target.closest('.btn-integ');
+  btn.textContent = '⏳ Enviando...'; btn.disabled = true;
   try {
-    btn.textContent = '⏳ Enviando...'; btn.disabled = true;
-    await fetch(gasUrl, { method: 'POST', mode: 'no-cors', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    alert('✅ Solicitud enviada al Google Apps Script.\nVerifica tu Google Sheet y las bandejas de correo.');
-  } catch (err) { alert('❌ Error al conectar con Google Apps Script:\n' + err.message); }
+    const res = await fetch(gasUrl, { method: 'POST', body: JSON.stringify(payload) });
+    const result = await res.json();
+    if (result.status === 'success') {
+      alert('✅ Reporte enviado y registrado correctamente.\nRevisa la Google Sheet y las bandejas de correo.');
+    } else {
+      alert('⚠ El script respondió con error:\n' + (result.message || 'Error desconocido'));
+    }
+  } catch (err) {
+    alert('❌ Error de conexión:\n' + err.message + '\n\nVerifica que el script esté publicado como Web App con acceso "Cualquiera".');
+  }
   btn.innerHTML = '<span>✈</span> Enviar reporte por email + registrar en Sheets'; btn.disabled = false;
 }
 
@@ -765,11 +772,18 @@ async function soloRegistrar() {
   if (!data.nombre) { alert('⚠ Ingresa el nombre del estudiante.'); return; }
   const payload = { action: 'registerOnly', sheetId, ...data };
   const btn = event.target.closest('.btn-integ');
+  btn.textContent = '⏳ Registrando...'; btn.disabled = true;
   try {
-    btn.textContent = '⏳ Registrando...'; btn.disabled = true;
-    await fetch(gasUrl, { method: 'POST', mode: 'no-cors', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    alert('✅ Datos enviados a la Google Sheet.\nVerifica que la fila se haya creado correctamente.');
-  } catch (err) { alert('❌ Error al conectar:\n' + err.message); }
+    const res = await fetch(gasUrl, { method: 'POST', body: JSON.stringify(payload) });
+    const result = await res.json();
+    if (result.status === 'success') {
+      alert('✅ Datos registrados correctamente en la Google Sheet.');
+    } else {
+      alert('⚠ El script respondió con error:\n' + (result.message || 'Error desconocido'));
+    }
+  } catch (err) {
+    alert('❌ Error de conexión:\n' + err.message + '\n\nVerifica que el script esté publicado como Web App con acceso "Cualquiera".');
+  }
   btn.innerHTML = '<span>↓</span> Solo registrar en Sheets'; btn.disabled = false;
 }
 

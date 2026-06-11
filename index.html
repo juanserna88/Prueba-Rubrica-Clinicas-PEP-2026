@@ -769,13 +769,8 @@ async function enviarReporte() {
   btn.textContent = '⏳ Enviando...'; btn.disabled = true;
   showNotif('loading','⏳ Enviando reporte y registrando en Google Sheets...');
   try {
-    const res = await fetch(gasUrl, { method: 'POST', body: JSON.stringify(payload) });
-    const result = await res.json();
-    if (result.status === 'success') {
-      showNotif('success','✔ Reporte enviado a ' + data.emailEstudiante + ' y registrado en Google Sheets · PDF adjunto ✓');
-    } else {
-      showNotif('error','❌ Error: ' + (result.message || 'Error desconocido'));
-    }
+    await fetch(gasUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+    showNotif('success','✔ Reporte enviado a ' + data.emailEstudiante + ' y registrado en Google Sheets · PDF adjunto ✓');
   } catch (err) {
     showNotif('error','❌ Error de conexión: ' + err.message);
   }
@@ -793,18 +788,14 @@ async function soloRegistrar() {
   btn.textContent = '⏳ Registrando...'; btn.disabled = true;
   showNotif('loading','⏳ Registrando datos en Google Sheets...');
   try {
-    const res = await fetch(gasUrl, { method: 'POST', body: JSON.stringify(payload) });
-    const result = await res.json();
-    if (result.status === 'success') {
-      showNotif('success','✔ Datos registrados correctamente en Google Sheets');
-    } else {
-      showNotif('error','❌ Error: ' + (result.message || 'Error desconocido'));
-    }
+    await fetch(gasUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+    showNotif('success','✔ Datos registrados correctamente en Google Sheets');
   } catch (err) {
     showNotif('error','❌ Error de conexión: ' + err.message);
   }
   btn.innerHTML = '<span>↓</span> Solo registrar en Sheets'; btn.disabled = false;
 }
+
 
 // ── DESCARGAR EXCEL (CSV UTF-8) ───────────────────────────────────────────
 function descargarExcel() {

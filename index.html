@@ -554,7 +554,7 @@
       <div class="integ-config" id="integConfig" style="display:none">
         <div class="integ-field full">
           <label>URL del Google Apps Script (Web App)</label>
-          <input type="url" id="gasUrl" value="https://script.google.com/macros/library/d/1w90LdlGEtaNS54GJazv4094DFkTDSTigZ-Er5gePCOsBZAbV8-7BoW1M/5">
+          <input type="url" id="gasUrl" value="https://script.google.com/macros/s/AKfycbzmhZ0nnz4rJLUEf2eQgxrAm4s9X9Xudl5C86h6FHh-GkHxa4kt6UjZTTaCb7ko8Ix1/exec">
           <div class="integ-hint">Pega aquí la URL de tu Web App después de publicar el script. Ver archivo <code>GAS_Script_ECOE.gs</code> adjunto con instrucciones paso a paso.</div>
         </div>
         <div class="integ-field full">
@@ -592,7 +592,7 @@ const BLOQUES = {1:['1.1','1.2','1.3'],2:['2.1','2.2','2.3','2.4'],3:['3.1','3.2
 const notas = {};
 
 // ── CONFIGURACIÓN FIJA (no editable) ──────────────────────────────────────
-const GAS_URL_DEFAULT = 'https://script.google.com/macros/library/d/1w90LdlGEtaNS54GJazv4094DFkTDSTigZ-Er5gePCOsBZAbV8-7BoW1M/5';
+const GAS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbzmhZ0nnz4rJLUEf2eQgxrAm4s9X9Xudl5C86h6FHh-GkHxa4kt6UjZTTaCb7ko8Ix1/exec';
 const SHEET_ID_DEFAULT = '1Ir3RHGE4rOYT9Ox9n803dVvakHeA6LIMwPR2prBuN3c';
 
 function getGasUrl() { return document.getElementById('gasUrl').value.trim() || GAS_URL_DEFAULT; }

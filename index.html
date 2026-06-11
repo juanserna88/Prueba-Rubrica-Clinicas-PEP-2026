@@ -156,6 +156,11 @@
   .integ-toggle:hover{opacity:.75}
   .integ-config{display:flex;flex-direction:column;gap:14px;padding:18px;background:var(--blanco);border:1px solid #E0D4F5;border-radius:8px;margin-bottom:16px}
   .integ-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+  .integ-notif{padding:12px 18px;border-radius:8px;font-size:.84rem;font-weight:600;line-height:1.4;margin-bottom:12px;display:flex;align-items:center;gap:8px;animation:slideIn .3s ease}
+  .integ-notif.success{background:#D1FAE5;border:1.5px solid #34D399;color:#065F46}
+  .integ-notif.error{background:#FEE2E2;border:1.5px solid #F87171;color:#991B1B}
+  .integ-notif.loading{background:#EDE9FE;border:1.5px solid #A78BFA;color:#5B21B6}
+  @keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
   .btn-integ{font-family:'Inter',sans-serif;font-size:.82rem;font-weight:700;padding:12px 24px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;transition:opacity .15s,transform .1s;letter-spacing:.02em}
   .btn-integ:hover{opacity:.88;transform:translateY(-1px)}.btn-integ:active{transform:translateY(0)}
   .btn-integ-primary{background:#6B3FA0;color:var(--blanco)}
@@ -549,7 +554,7 @@
       <div class="integ-config" id="integConfig" style="display:none">
         <div class="integ-field full">
           <label>URL del Google Apps Script (Web App)</label>
-          <input type="url" id="gasUrl" value="https://script.google.com/macros/s/AKfycbw9ql7jzvAdPH_safNX49VS4sGLfoZEJFKZ2kN1szXNC2-G8Fg6SXYzw9oO9xd9w8f1/exec">
+          <input type="url" id="gasUrl" value="https://script.google.com/macros/s/AKfycbzmhZ0nnz4rJLUEf2eQgxrAm4s9X9Xudl5C86h6FHh-GkHxa4kt6UjZTTaCb7ko8Ix1/exec">
           <div class="integ-hint">Pega aquí la URL de tu Web App después de publicar el script. Ver archivo <code>GAS_Script_ECOE.gs</code> adjunto con instrucciones paso a paso.</div>
         </div>
         <div class="integ-field full">
@@ -558,6 +563,8 @@
           <div class="integ-hint">El ID está en la URL de tu hoja: <code>docs.google.com/spreadsheets/d/<strong>ID_AQUÍ</strong>/edit</code></div>
         </div>
       </div>
+
+      <div class="integ-notif" id="integNotif" style="display:none"></div>
 
       <div class="integ-actions">
         <button class="btn-integ btn-integ-primary" onclick="enviarReporte()">
@@ -585,7 +592,7 @@ const BLOQUES = {1:['1.1','1.2','1.3'],2:['2.1','2.2','2.3','2.4'],3:['3.1','3.2
 const notas = {};
 
 // ── CONFIGURACIÓN FIJA (no editable) ──────────────────────────────────────
-const GAS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbw9ql7jzvAdPH_safNX49VS4sGLfoZEJFKZ2kN1szXNC2-G8Fg6SXYzw9oO9xd9w8f1/exec';
+const GAS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbzmhZ0nnz4rJLUEf2eQgxrAm4s9X9Xudl5C86h6FHh-GkHxa4kt6UjZTTaCb7ko8Ix1/exec';
 const SHEET_ID_DEFAULT = '1Ir3RHGE4rOYT9Ox9n803dVvakHeA6LIMwPR2prBuN3c';
 
 function getGasUrl() { return document.getElementById('gasUrl').value.trim() || GAS_URL_DEFAULT; }
@@ -740,26 +747,37 @@ function recopilarDatos() {
   return { ...campos, criterios: criteriosData, bloques: bloquesData, notaFinal: total, nivel, fecha: new Date().toISOString() };
 }
 
+// ── NOTIFICACIÓN INLINE ───────────────────────────────────────────────────
+function showNotif(type, msg) {
+  var el = document.getElementById('integNotif');
+  el.className = 'integ-notif ' + type;
+  el.innerHTML = msg;
+  el.style.display = 'flex';
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  if (type === 'success') setTimeout(function(){ el.style.display='none'; }, 12000);
+}
+
 // ── ENVIAR REPORTE POR EMAIL + REGISTRAR ──────────────────────────────────
 async function enviarReporte() {
   const gasUrl = getGasUrl();
   const sheetId = getSheetId();
   const data = recopilarDatos();
-  if (!data.nombre) { alert('⚠ Ingresa el nombre del estudiante.'); return; }
-  if (!data.emailEstudiante) { alert('⚠ Ingresa el email del estudiante.'); return; }
+  if (!data.nombre) { showNotif('error','⚠ Ingresa el nombre del estudiante.'); return; }
+  if (!data.emailEstudiante) { showNotif('error','⚠ Ingresa el email del estudiante.'); return; }
   const payload = { action: 'sendAndRegister', sheetId, ...data };
   const btn = event.target.closest('.btn-integ');
   btn.textContent = '⏳ Enviando...'; btn.disabled = true;
+  showNotif('loading','⏳ Enviando reporte y registrando en Google Sheets...');
   try {
     const res = await fetch(gasUrl, { method: 'POST', body: JSON.stringify(payload) });
     const result = await res.json();
     if (result.status === 'success') {
-      alert('✅ Reporte enviado y registrado correctamente.\nRevisa la Google Sheet y las bandejas de correo.');
+      showNotif('success','✔ Reporte enviado a ' + data.emailEstudiante + ' y registrado en Google Sheets · PDF adjunto ✓');
     } else {
-      alert('⚠ El script respondió con error:\n' + (result.message || 'Error desconocido'));
+      showNotif('error','❌ Error: ' + (result.message || 'Error desconocido'));
     }
   } catch (err) {
-    alert('❌ Error de conexión:\n' + err.message + '\n\nVerifica que el script esté publicado como Web App con acceso "Cualquiera".');
+    showNotif('error','❌ Error de conexión: ' + err.message);
   }
   btn.innerHTML = '<span>✈</span> Enviar reporte por email + registrar en Sheets'; btn.disabled = false;
 }
@@ -769,20 +787,21 @@ async function soloRegistrar() {
   const gasUrl = getGasUrl();
   const sheetId = getSheetId();
   const data = recopilarDatos();
-  if (!data.nombre) { alert('⚠ Ingresa el nombre del estudiante.'); return; }
+  if (!data.nombre) { showNotif('error','⚠ Ingresa el nombre del estudiante.'); return; }
   const payload = { action: 'registerOnly', sheetId, ...data };
   const btn = event.target.closest('.btn-integ');
   btn.textContent = '⏳ Registrando...'; btn.disabled = true;
+  showNotif('loading','⏳ Registrando datos en Google Sheets...');
   try {
     const res = await fetch(gasUrl, { method: 'POST', body: JSON.stringify(payload) });
     const result = await res.json();
     if (result.status === 'success') {
-      alert('✅ Datos registrados correctamente en la Google Sheet.');
+      showNotif('success','✔ Datos registrados correctamente en Google Sheets');
     } else {
-      alert('⚠ El script respondió con error:\n' + (result.message || 'Error desconocido'));
+      showNotif('error','❌ Error: ' + (result.message || 'Error desconocido'));
     }
   } catch (err) {
-    alert('❌ Error de conexión:\n' + err.message + '\n\nVerifica que el script esté publicado como Web App con acceso "Cualquiera".');
+    showNotif('error','❌ Error de conexión: ' + err.message);
   }
   btn.innerHTML = '<span>↓</span> Solo registrar en Sheets'; btn.disabled = false;
 }

@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rúbrica Estandarizada — Rotaciones Clínicas · U. de Manizales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul:#1F3864; --azul-med:#2E74B5; --azul-clar:#BDD7EE; --azul-xc:#EBF3FB;
+    --verde:#2D6A4F; --verde-clar:#D8F3DC; --amber:#E9A800; --amber-clar:#FFF3CC;
+    --gris:#F0F4F8; --gris-med:#CBD5E1; --gris-osc:#64748B; --texto:#1E293B; --blanco:#FFFFFF;
+    --n4:#E2EFDA; --n4-brd:#70AD47; --n3:#FFF2CC; --n3-brd:#E9A800;
+    --n2:#FCE4D6; --n2-brd:#ED7D31; --n1:#FFDAD6; --n1-brd:#C0392B;
+    --b1:#1F3864; --b2:#2E74B5; --b3:#2D6A4F; --b4:#6B3FA0;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:15px;scroll-behavior:smooth}
+  body{font-family:'Inter',sans-serif;background:var(--gris);color:var(--texto);line-height:1.5}
+  .page{max-width:1200px;margin:0 auto;background:var(--blanco);box-shadow:0 0 40px rgba(0,0,0,.10)}
+
+  /* CABECERA */
+  .header{background:var(--azul);padding:32px 40px 28px;position:relative;overflow:hidden}
+  .header-eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--azul-clar);margin-bottom:8px}
+  .header-title{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--blanco);line-height:1.2;max-width:700px}
+  .header-sub{margin-top:10px;font-size:.82rem;color:rgba(255,255,255,.65);font-weight:400}
+  .areas-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+  .badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:var(--blanco);font-size:.72rem;font-weight:600;letter-spacing:.04em;padding:4px 10px;border-radius:20px}
+
+  /* BARRA DE PESOS */
+  .weights-bar-wrap{background:var(--azul);padding:0 40px 24px;border-bottom:3px solid var(--amber)}
+  .weights-label{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:8px}
+  .weights-track{display:flex;height:14px;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.12)}
+  .weights-track .seg{height:100%;transition:width .4s ease}
+  .seg-b1{background:#5B8AC4}.seg-b2{background:#70B8FF}.seg-b3{background:#52B788}.seg-b4{background:#C084FC}
+  .weights-legend{display:flex;gap:20px;margin-top:8px;flex-wrap:wrap}
+  .wl-item{display:flex;align-items:center;gap:6px;font-size:.72rem;color:rgba(255,255,255,.7)}
+  .wl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+  /* NOTA FINAL STICKY */
+  .nota-badge{position:sticky;top:0;z-index:100;background:var(--azul);padding:10px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--amber)}
+  .nota-label{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+  .nota-valor{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--amber);line-height:1;min-width:80px;text-align:right}
+  .nota-nivel{font-size:.78rem;font-weight:600;padding:4px 12px;border-radius:20px;margin-left:16px}
+  .nivel-sob{background:var(--n4);color:#375623}.nivel-sat{background:var(--n3);color:#7D4E00}
+  .nivel-dev{background:var(--n2);color:#843C00}.nivel-no{background:var(--n1);color:#922B21}
+  .nivel-pend{background:rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
+
+  /* IDENTIFICACIÓN */
+  .section-ident{padding:28px 40px;background:var(--azul-xc);border-bottom:1px solid var(--azul-clar)}
+  .section-title{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--azul-med);margin-bottom:16px}
+  .ident-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .field{display:flex;flex-direction:column;gap:4px}
+  .field label{font-size:.7rem;font-weight:600;color:var(--gris-osc);letter-spacing:.04em;text-transform:uppercase}
+  .field input,.field select{font-family:'Inter',sans-serif;font-size:.875rem;padding:7px 10px;border:1.5px solid var(--gris-med);border-radius:6px;background:var(--blanco);color:var(--texto);transition:border-color .2s;outline:none}
+  .field input:focus,.field select:focus{border-color:var(--azul-med);box-shadow:0 0 0 3px rgba(46,116,181,.15)}
+  .field.wide{grid-column:1/-1}
+
+  /* RÚBRICA */
+  .rubrica-wrap{padding:32px 40px}
+  .bloque{margin-bottom:28px;border-radius:10px;overflow:hidden;border:1.5px solid var(--gris-med);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .bloque-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;color:var(--blanco);position:relative}
+  .bloque-header-left{display:flex;align-items:center;gap:12px}
+  .bloque-num{font-size:1.5rem;font-family:'DM Serif Display',serif;opacity:.5;line-height:1}
+  .bloque-name{font-size:.88rem;font-weight:700;line-height:1.3}
+  .bloque-desc{font-size:.7rem;font-weight:400;opacity:.75;margin-top:2px}
+  .bloque-peso-badge{font-size:1.4rem;font-family:'DM Serif Display',serif;background:rgba(255,255,255,.18);padding:4px 14px;border-radius:6px;flex-shrink:0}
+  .bloque-subtotal{font-size:.72rem;text-align:right;opacity:.8;margin-top:2px}
+  .b1-style .bloque-header{background:var(--b1)}.b2-style .bloque-header{background:var(--b2)}
+  .b3-style .bloque-header{background:var(--b3)}.b4-style .bloque-header{background:var(--b4)}
+
+  /* CARDS DE CRITERIOS */
+  .criterios-lista{padding:12px 16px;display:flex;flex-direction:column;gap:10px;background:var(--blanco)}
+  .crit-card{border:1.5px solid var(--gris-med);border-radius:8px;overflow:hidden}
+  .crit-card-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;background:var(--gris)}
+  .crit-card-info{display:flex;align-items:center;flex-wrap:wrap;gap:6px;flex:1}
+  .crit-card-score{display:flex;flex-direction:column;align-items:center;flex-shrink:0;gap:3px;min-width:90px}
+  .pond-wrap{font-size:.72rem;color:var(--azul);font-weight:700}
+  .pond-wrap .pond-label{font-size:.65rem;color:var(--gris-osc);font-weight:400}
+  .niveles-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--gris-med)}
+  .nv{padding:9px 11px;font-size:.74rem;line-height:1.4;cursor:pointer;transition:opacity .15s;border-right:1px solid var(--gris-med);position:relative}
+  .nv:last-child{border-right:none}
+  .nv:hover{opacity:.82}
+  .nv.n4{background:var(--n4);border-top:3px solid var(--n4-brd)}.nv.n3{background:var(--n3);border-top:3px solid var(--n3-brd)}
+  .nv.n2{background:var(--n2);border-top:3px solid var(--n2-brd)}.nv.n1{background:var(--n1);border-top:3px solid var(--n1-brd)}
+  .nv.selected{outline:3px solid var(--azul);outline-offset:-2px;z-index:1}
+  .nv.selected::after{content:"✓";position:absolute;top:5px;right:7px;font-size:.7rem;font-weight:700;color:var(--azul);background:white;width:16px;height:16px;border-radius:50%;line-height:16px;text-align:center}
+  .nv .nivel-tag{display:block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px}
+  .nv.n4 .nivel-tag{color:var(--n4-brd)}.nv.n3 .nivel-tag{color:#7D4E00}
+  .nv.n2 .nivel-tag{color:var(--n2-brd)}.nv.n1 .nivel-tag{color:var(--n1-brd)}
+  .bloque-footer{display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:8px 20px 10px;background:rgba(0,0,0,.03);border-top:1px solid var(--gris-med)}
+  .footer-label{font-size:.72rem;color:var(--gris-osc)}
+  .footer-val{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--azul);font-weight:700}
+
+  /* INPUTS */
+  .crit-code{font-size:.65rem;font-weight:700;letter-spacing:.08em;color:var(--gris-osc);text-transform:uppercase}
+  .crit-name{font-size:.82rem;font-weight:600;color:var(--texto);line-height:1.35}
+  .crit-miller{display:inline-block;margin-top:5px;font-size:.62rem;font-weight:600;background:var(--azul-xc);color:var(--azul-med);border:1px solid var(--azul-clar);padding:2px 7px;border-radius:12px;white-space:nowrap}
+  .crit-peso-inline{display:inline-block;margin-top:4px;font-size:.62rem;font-weight:700;background:var(--amber-clar);color:#7D4E00;border:1px solid var(--amber);padding:2px 7px;border-radius:12px}
+  .cal-input{font-family:'DM Serif Display',serif;font-size:1.4rem;text-align:center;width:72px;padding:6px 4px;border:2px solid var(--gris-med);border-radius:8px;background:var(--blanco);color:var(--texto);outline:none;transition:border-color .2s,box-shadow .2s;display:block;margin:0 auto}
+  .cal-input:focus{border-color:var(--azul-med);box-shadow:0 0 0 3px rgba(46,116,181,.18)}
+  .cal-hint{font-size:.6rem;color:var(--gris-osc);margin-top:3px}
+  .pond-val{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--azul);display:block}
+  .pond-label{font-size:.6rem;color:var(--gris-osc)}
+
+  /* PANEL RESUMEN */
+  .resumen-panel{margin:0 40px 32px;background:var(--azul);border-radius:10px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  .resumen-bloques{display:flex;gap:16px;flex-wrap:wrap}
+  .resumen-blq{text-align:center;min-width:70px}
+  .resumen-blq-nota{font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--blanco);display:block;line-height:1}
+  .resumen-blq-label{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.5);margin-top:3px;display:block}
+  .resumen-sep{width:1px;height:40px;background:rgba(255,255,255,.15);flex-shrink:0}
+  .resumen-total-wrap{text-align:center}
+  .resumen-total-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.55);margin-bottom:4px}
+  .resumen-total-nota{font-family:'DM Serif Display',serif;font-size:3rem;color:var(--amber);line-height:1;display:block}
+  .resumen-nivel-badge{display:inline-block;margin-top:6px;font-size:.72rem;font-weight:700;padding:4px 14px;border-radius:20px}
+
+  /* RETROALIMENTACIÓN */
+  .retro-section{margin:0 40px 32px;border:1.5px solid var(--azul-clar);border-radius:10px;overflow:hidden}
+  .retro-header{background:var(--azul);padding:12px 20px;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:8px}
+  .retro-icon{font-size:1rem}
+  .retro-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+  .retro-field{padding:16px 20px;border-right:1px solid var(--azul-clar);border-bottom:1px solid var(--azul-clar)}
+  .retro-field:nth-child(2n){border-right:none}
+  .retro-field:nth-last-child(-n+2){border-bottom:none}
+  .retro-field label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--azul-med);display:block;margin-bottom:6px}
+  .retro-field textarea{font-family:'Inter',sans-serif;font-size:.82rem;width:100%;min-height:80px;padding:8px 10px;border:1.5px solid var(--gris-med);border-radius:6px;background:var(--blanco);color:var(--texto);resize:vertical;outline:none;line-height:1.5;transition:border-color .2s}
+  .retro-field textarea:focus{border-color:var(--azul-med);box-shadow:0 0 0 3px rgba(46,116,181,.12)}
+  .retro-field.full{grid-column:1/-1;border-right:none}
+
+  /* ACCIONES */
+  .acciones{padding:20px 40px 36px;display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid var(--gris-med)}
+  .btn{font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.02em}
+  .btn:hover{opacity:.88;transform:translateY(-1px)}.btn:active{transform:translateY(0)}
+  .btn-primary{background:var(--azul);color:var(--blanco)}.btn-secondary{background:var(--gris);color:var(--texto);border:1.5px solid var(--gris-med)}
+  .btn-amber{background:var(--amber);color:#3B2200}.btn-danger{background:#fff0f0;color:var(--n1-brd);border:1.5px solid var(--n1-brd)}
+
+  /* INTEGRACIÓN GOOGLE */
+  .integ-section{margin:0 40px 32px;border-radius:10px;overflow:hidden;border:2px solid #6B3FA0;box-shadow:0 4px 16px rgba(107,63,160,.12)}
+  .integ-header{background:#6B3FA0;padding:14px 20px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blanco);display:flex;align-items:center;gap:8px}
+  .integ-icon{font-size:1rem}
+  .integ-body{padding:20px 24px;background:#faf8ff}
+  .integ-help{background:var(--blanco);border:1px solid #E0D4F5;border-radius:8px;padding:14px 18px;font-size:.8rem;line-height:1.55;color:var(--texto);margin-bottom:20px}
+  .integ-help strong{color:#6B3FA0}
+  .integ-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+  .integ-field{display:flex;flex-direction:column;gap:5px}
+  .integ-field.full{grid-column:1/-1}
+  .integ-field label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B3FA0;display:flex;align-items:center;gap:6px}
+  .integ-dot{width:8px;height:8px;border-radius:50%;background:#6B3FA0;display:inline-block}
+  .integ-field input{font-family:'Inter',sans-serif;font-size:.85rem;padding:9px 12px;border:1.5px solid #D4C5E9;border-radius:8px;background:var(--blanco);color:var(--texto);outline:none;transition:border-color .2s,box-shadow .2s}
+  .integ-field input:focus{border-color:#6B3FA0;box-shadow:0 0 0 3px rgba(107,63,160,.15)}
+  .integ-hint{font-size:.7rem;color:var(--gris-osc);line-height:1.4;margin-top:2px}
+  .integ-hint code{background:#EDE7F6;padding:1px 5px;border-radius:3px;font-size:.68rem;color:#4A148C}
+  .integ-toggle{padding:6px 0;font-size:.78rem;color:#6B3FA0;cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:14px;font-weight:600;user-select:none}
+  .integ-toggle:hover{opacity:.75}
+  .integ-config{display:flex;flex-direction:column;gap:14px;padding:18px;background:var(--blanco);border:1px solid #E0D4F5;border-radius:8px;margin-bottom:16px}
+  .integ-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+  .btn-integ{font-family:'Inter',sans-serif;font-size:.82rem;font-weight:700;padding:12px 24px;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;gap:8px;transition:opacity .15s,transform .1s;letter-spacing:.02em}
+  .btn-integ:hover{opacity:.88;transform:translateY(-1px)}.btn-integ:active{transform:translateY(0)}
+  .btn-integ-primary{background:#6B3FA0;color:var(--blanco)}
+  .btn-integ-secondary{background:#EDE7F6;color:#4A148C;border:1.5px solid #D4C5E9}
+  @media(max-width:700px){.integ-row{grid-template-columns:1fr}.integ-section{margin-left:0;margin-right:0}}
+  @media print{.integ-section{display:none}}
+
+  /* PRINT */
+  @media print {
+    body{background:white;font-size:11px}
+    .page{box-shadow:none;max-width:100%}
+    .nota-badge{position:static}
+    .acciones{display:none}
+    .bloque{page-break-inside:avoid}
+    .retro-section{page-break-inside:avoid}
+    @page{margin:1.5cm;size:A4 landscape}
+  }
+
+  /* RESPONSIVE */
+  @media (max-width:900px){
+    .header,.weights-bar-wrap,.rubrica-wrap,.retro-section,.resumen-panel,.acciones{padding-left:16px;padding-right:16px}
+    .retro-section,.resumen-panel{margin-left:0;margin-right:0}
+    .retro-grid{grid-template-columns:1fr}
+    .retro-field{border-right:none}
+    
+    .nota-badge{padding:8px 16px}
+  }
+  @media (max-width:700px){
+    .niveles-strip{grid-template-columns:1fr 1fr}
+    .crit-card-top{flex-wrap:wrap}
+  }
+
+  /* TOOLTIP */
+  [data-tip]{position:relative}
+  [data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--azul);color:white;font-size:.65rem;white-space:nowrap;padding:4px 9px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:200}
+  [data-tip]:hover::after{opacity:1}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- CABECERA -->
+  <header class="header">
+    <div class="header-eyebrow">Universidad de Manizales · Facultad de Ciencias de la Salud · Programa de Medicina</div>
+    <h1 class="header-title">Rúbrica Estandarizada de Evaluación de Rotaciones Clínicas</h1>
+    <p class="header-sub">PEP 2026</p>
+    <div class="areas-badges">
+      <span class="badge">Semiología Médica</span>
+      <span class="badge">Pediatría</span>
+      <span class="badge">Medicina Interna</span>
+      <span class="badge">Cirugía</span>
+      <span class="badge">Ginecología y Obstetricia</span>
+    </div>
+  </header>
+
+  <!-- NOTA FINAL STICKY -->
+  <div class="nota-badge">
+    <div>
+      <div class="nota-label">Nota final de rotación</div>
+      <div style="font-size:.68rem;color:rgba(255,255,255,.45)">Se actualiza al ingresar calificaciones</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="nota-valor" id="notaFinal">—</div>
+      <div class="nota-nivel nivel-pend" id="nivelBadge">Pendiente</div>
+    </div>
+  </div>
+
+  <!-- IDENTIFICACIÓN -->
+  <section class="section-ident">
+    <div class="section-title">Datos de identificación</div>
+    <div class="ident-grid">
+      <div class="field wide">
+        <label>Nombre completo del estudiante</label>
+        <input type="text" id="nombre" placeholder="Apellidos y nombres">
+      </div>
+      <div class="field">
+        <label>Código estudiantil</label>
+        <input type="text" id="codigo" placeholder="152024XXXXXX">
+      </div>
+      <div class="field">
+        <label>Cohorte</label>
+        <input type="text" id="semestre" placeholder="Ej: 2026-1">
+      </div>
+      <div class="field">
+        <label>Semestre</label>
+        <select id="area">
+          <option value="">— Seleccionar —</option>
+          <option>Semiología</option>
+          <option>Pediatría</option>
+          <option>Medicina Interna</option>
+          <option>Cirugía</option>
+          <option>Ginecología y Obstetricia</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Sede / Servicio hospitalario</label>
+        <input type="text" id="sede" placeholder="Ej: Hospital de Caldas · Urgencias">
+      </div>
+      <div class="field">
+        <label>Período académico</label>
+        <input type="text" id="periodo" placeholder="2026-1">
+      </div>
+      <div class="field">
+        <label>Fecha inicio rotación</label>
+        <input type="date" id="fechaInicio">
+      </div>
+      <div class="field">
+        <label>Fecha fin rotación</label>
+        <input type="date" id="fechaFin">
+      </div>
+      <div class="field wide">
+        <label>Docente evaluador principal</label>
+        <input type="text" id="docente" placeholder="Nombre completo · Especialidad">
+      </div>
+    </div>
+  </section>
+
+  <!-- RÚBRICA -->
+  <section class="rubrica-wrap">
+    <div class="section-title" style="margin-bottom:20px">Rúbrica analítica — Ingrese la nota directamente o use los descriptores como referencia para asignarla</div>
+
+    <!-- BLOQUE 1 -->
+    <div class="bloque b1-style" id="bloque1">
+      <div class="bloque-header">
+        <div class="bloque-header-left">
+          <span class="bloque-num">01</span>
+          <div><div class="bloque-name">Conocimientos Teóricos</div><div class="bloque-desc">Fundamentos fisiopatológicos · Síndromes y entidades · Paraclínicos</div></div>
+        </div>
+        <div style="text-align:right"><div class="bloque-peso-badge">30%</div><div class="bloque-subtotal" id="sub1">Subtotal: —</div></div>
+      </div>
+      <div class="criterios-lista">
+
+        <div class="crit-card" data-crit="1.1" data-peso="10">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">1.1</span><span class="crit-name">Fundamentos fisiopatológicos y semiológicos</span><span class="crit-miller">Saber / Saber cómo</span><span class="crit-peso-inline">10%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_1.1">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Domina los fundamentos fisiopatológicos. Relaciona mecanismos de enfermedad con signos y síntomas de forma precisa, sin errores conceptuales.</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Maneja los fundamentos esenciales con errores conceptuales menores que no afectan el razonamiento clínico global.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Conocimiento básico con vacíos en la correlación fisiopatológica. Requiere orientación para establecer relaciones mecanismo-síntoma.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>Errores conceptuales fundamentales que comprometen el razonamiento clínico. No establece relaciones fisiopatológicas.</div>
+          </div>
+        </div>
+
+        <div class="crit-card" data-crit="1.2" data-peso="12">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">1.2</span><span class="crit-name">Conocimiento de síndromes y entidades clínicas del área</span><span class="crit-miller">Saber / Saber cómo</span><span class="crit-peso-inline">12%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_1.2">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Identifica y caracteriza correctamente los síndromes y entidades prevalentes del área, incluyendo criterios diagnósticos, clasificaciones vigentes y diagnóstico diferencial.</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Reconoce los síndromes principales con omisiones en criterios diagnósticos o clasificaciones. Diferencial parcialmente correcto.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Reconoce las entidades más frecuentes con confusiones en criterios o clasificaciones. Diagnóstico diferencial limitado.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>No identifica correctamente los síndromes del área o confunde entidades clínicas fundamentales.</div>
+          </div>
+        </div>
+
+        <div class="crit-card" data-crit="1.3" data-peso="8">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">1.3</span><span class="crit-name">Interpretación de paraclínicos básicos del área</span><span class="crit-miller">Saber cómo</span><span class="crit-peso-inline">8%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_1.3">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Interpreta correctamente los paraclínicos básicos (laboratorio, imágenes, ECG según el área) e integra los hallazgos al razonamiento diagnóstico.</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Interpreta los paraclínicos más frecuentes con errores menores. Integración parcial con el diagnóstico.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Interpreta solo los paraclínicos más elementales. Requiere guía del docente para relacionarlos con el diagnóstico.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>No interpreta correctamente los paraclínicos básicos del área.</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="bloque-footer"><span class="footer-label">Subtotal B1 — Conocimientos Teóricos (10% + 12% + 8% = 30%)</span><span class="footer-val" id="subval1">—</span></div>
+    </div>
+
+    <!-- BLOQUE 2 -->
+    <div class="bloque b2-style" id="bloque2">
+      <div class="bloque-header">
+        <div class="bloque-header-left">
+          <span class="bloque-num">02</span>
+          <div><div class="bloque-name">HC y Habilidades Clínico-Quirúrgicas en Rondas</div><div class="bloque-desc">Anamnesis · Examen físico · Integración diagnóstica · Procedimientos</div></div>
+        </div>
+        <div style="text-align:right"><div class="bloque-peso-badge">35%</div><div class="bloque-subtotal" id="sub2">Subtotal: —</div></div>
+      </div>
+      <div class="criterios-lista">
+
+        <div class="crit-card" data-crit="2.1" data-peso="10">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">2.1</span><span class="crit-name">Historia clínica: anamnesis, motivo de consulta y enfermedad actual</span><span class="crit-miller">Mostrar cómo / Hacer</span><span class="crit-peso-inline">10%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_2.1">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Anamnesis estructurada y completa. Jerarquiza síntomas guía, establece cronograma de la enfermedad y aplica método semiológico sin omisiones relevantes.</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Anamnesis ordenada con omisiones menores no clínicamente relevantes. Jerarquización adecuada con apoyo ocasional del docente.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Anamnesis incompleta o desorganizada. Omite datos relevantes. Requiere orientación frecuente del docente en la ronda.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>No estructura el motivo de consulta ni aplica método semiológico. Intervención constante del docente.</div>
+          </div>
+        </div>
+
+        <div class="crit-card" data-crit="2.2" data-peso="10">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">2.2</span><span class="crit-name">Examen físico segmentario y focalizado</span><span class="crit-miller">Mostrar cómo / Hacer</span><span class="crit-peso-inline">10%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_2.2">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Examen físico sistemático y completo. Aplica correctamente inspección, palpación, percusión y auscultación. Identifica todos los hallazgos patológicos relevantes.</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Examen ordenado con omisiones menores. Técnica adecuada en la mayoría de maniobras. Identifica los hallazgos más evidentes.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Examen incompleto con omisiones clínicamente relevantes. Técnica deficiente en varias maniobras. Requiere supervisión directa.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>No sistematiza el examen físico. Técnica incorrecta en la mayoría de maniobras. No identifica hallazgos patológicos.</div>
+          </div>
+        </div>
+
+        <div class="crit-card" data-crit="2.3" data-peso="8">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">2.3</span><span class="crit-name">Integración diagnóstica: hipótesis y plan</span><span class="crit-miller">Saber cómo / Mostrar cómo</span><span class="crit-peso-inline">8%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_2.3">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Formula diagnóstico sindrómico con diferenciales jerarquizados y argumentados. Propone plan diagnóstico-terapéutico pertinente y eficiente para el nivel de atención.</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Hipótesis diagnósticas plausibles con argumentación o jerarquización parcial. Plan diagnóstico aceptable con omisiones menores.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Plantea diagnóstico principal sin diferenciales o con plan incompleto. Requiere orientación del docente.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>No establece hipótesis coherentes ni propone plan. No integra la información clínica disponible.</div>
+          </div>
+        </div>
+
+        <div class="crit-card" data-crit="2.4" data-peso="7">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">2.4</span><span class="crit-name">Habilidades procedimentales básicas del área</span><span class="crit-miller">Mostrar cómo / Hacer</span><span class="crit-peso-inline">7%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_2.4">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Ejecuta los procedimientos del área con técnica correcta, respetando asepsia y seguridad. (Semiología: HC completa; Pediatría: val. desarrollo; Cirugía: cuidado heridas; GinecoObst.: Leopold).</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Ejecuta los procedimientos principales con errores técnicos menores. Respeta las normas de seguridad con orientación puntual.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Ejecuta procedimientos con errores moderados que requieren corrección. Supervisión directa en la mayoría de pasos.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>No puede ejecutar procedimientos básicos sin intervención del docente. Errores que comprometen la seguridad.</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="bloque-footer"><span class="footer-label">Subtotal B2 — HC y Habilidades (10% + 10% + 8% + 7% = 35%)</span><span class="footer-val" id="subval2">—</span></div>
+    </div>
+
+    <!-- BLOQUE 3 -->
+    <div class="bloque b3-style" id="bloque3">
+      <div class="bloque-header">
+        <div class="bloque-header-left">
+          <span class="bloque-num">03</span>
+          <div><div class="bloque-name">Profesionalismo, Actitud, Iniciativa, Puntualidad y Relaciones</div><div class="bloque-desc">Responsabilidad · Iniciativa · Relación con compañeros, docentes y personal</div></div>
+        </div>
+        <div style="text-align:right"><div class="bloque-peso-badge">5%</div><div class="bloque-subtotal" id="sub3">Subtotal: —</div></div>
+      </div>
+      <div class="criterios-lista">
+
+        <div class="crit-card" data-crit="3.1" data-peso="3">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">3.1</span><span class="crit-name">Responsabilidad, puntualidad, iniciativa e interés</span><span class="crit-miller">Hacer</span><span class="crit-peso-inline">3%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_3.1">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Asistencia puntual y completa. Cumple responsabilidades de forma autónoma y proactiva. Demuestra iniciativa permanente en el aprendizaje y la atención de pacientes.</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Asistencia regular con ausencias justificadas. Cumple responsabilidades con recordatorio ocasional. Iniciativa adecuada.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Impuntualidad o ausencias no justificadas ocasionales. Cumplimiento parcial de responsabilidades. Poca iniciativa.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>Patrón recurrente de impuntualidad o ausencias injustificadas. Incumplimiento de responsabilidades. Sin iniciativa.</div>
+          </div>
+        </div>
+
+        <div class="crit-card" data-crit="3.2" data-peso="2">
+          <div class="crit-card-top">
+            <div class="crit-card-info"><span class="crit-code">3.2</span><span class="crit-name">Relación con compañeros, docentes y personal del sitio de práctica</span><span class="crit-miller">Hacer</span><span class="crit-peso-inline">2%</span></div>
+            <div class="crit-card-score"><input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" oninput="actualizarCalificacion(this)"><div class="cal-hint">0.0 – 5.0</div><div class="pond-wrap"><span class="pond-val" id="pond_3.2">—</span><span class="pond-label"> pond.</span></div></div>
+          </div>
+          <div class="niveles-strip">
+            <div class="nv n4" onclick="seleccionarNivel(this,4.8)"><span class="nivel-tag">Sobresaliente</span>Colabora activamente con todo el equipo. Relaciones respetuosas. Acepta la retroalimentación con disposición reflexiva y actitud de mejora continua.</div>
+            <div class="nv n3" onclick="seleccionarNivel(this,3.9)"><span class="nivel-tag">Satisfactorio</span>Trabajo en equipo adecuado con mínimas dificultades de relación. Acepta la retroalimentación con motivación.</div>
+            <div class="nv n2" onclick="seleccionarNivel(this,3.2)"><span class="nivel-tag">En Desarrollo</span>Participación pasiva en el equipo. Dificultades ocasionales de relación. Resistencia parcial a la retroalimentación.</div>
+            <div class="nv n1" onclick="seleccionarNivel(this,2.0)"><span class="nivel-tag">No Satisfactorio</span>No colabora con el equipo. Actitud conflictiva o defensiva. Rechaza la retroalimentación del docente.</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="bloque-footer"><span class="footer-label">Subtotal B3 — Profesionalismo y Actitud (3% + 2% = 5%)</span><span class="footer-val" id="subval3">—</span></div>
+    </div>
+
+    <!-- BLOQUE 4: EXAMEN FINAL DE ROTACIÓN -->
+    <div class="bloque b4-style" id="bloque4">
+      <div class="bloque-header">
+        <div class="bloque-header-left">
+          <span class="bloque-num">04</span>
+          <div><div class="bloque-name">Examen Final de Rotación</div><div class="bloque-desc">Examen escrito 15% · Examen basado en simulación clínica 15%</div></div>
+        </div>
+        <div style="text-align:right"><div class="bloque-peso-badge">30%</div><div class="bloque-subtotal" id="sub4">Subtotal: —</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;background:#faf8ff;">
+        <!-- 4.1 Escrito -->
+        <div style="padding:24px 28px;border-right:1.5px solid var(--gris-med);">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B3FA0;margin-bottom:5px;">4.1 · Examen escrito</div>
+          <div style="font-size:.78rem;color:var(--gris-osc);line-height:1.5;margin-bottom:16px;">Nota de la prueba escrita de fin de rotación.</div>
+          <div style="display:flex;align-items:center;gap:20px;">
+            <div style="text-align:center;">
+              <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gris-osc);margin-bottom:4px;">Calificación</div>
+              <input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" style="width:90px;font-size:1.6rem;padding:8px 6px;border-color:#6B3FA0;" data-crit-direct="4.1" oninput="actualizarDirecto(this)">
+              <div style="font-size:.62rem;color:var(--gris-osc);margin-top:3px;">0.0 – 5.0</div>
+            </div>
+            <div style="text-align:center;min-width:70px;">
+              <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gris-osc);margin-bottom:4px;">Ponderado</div>
+              <span class="pond-val" id="pond_4.1" style="font-size:1.3rem;">—</span>
+              <div style="font-size:.62rem;color:var(--gris-osc);margin-top:2px;">pts pond.</div>
+            </div>
+            <div style="background:var(--amber-clar);border:1px solid var(--amber);border-radius:12px;padding:3px 10px;font-size:.65rem;font-weight:700;color:#7D4E00;">15%</div>
+          </div>
+        </div>
+        <!-- 4.2 Simulación -->
+        <div style="padding:24px 28px;">
+          <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B3FA0;margin-bottom:5px;">4.2 · Examen basado en simulación clínica</div>
+          <div style="font-size:.78rem;color:var(--gris-osc);line-height:1.5;margin-bottom:16px;">Nota del examen práctico en escenario de simulación (ECOE u otro).</div>
+          <div style="display:flex;align-items:center;gap:20px;">
+            <div style="text-align:center;">
+              <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gris-osc);margin-bottom:4px;">Calificación</div>
+              <input class="cal-input" type="number" min="0" max="5" step="0.1" placeholder="—" style="width:90px;font-size:1.6rem;padding:8px 6px;border-color:#6B3FA0;" data-crit-direct="4.2" oninput="actualizarDirecto(this)">
+              <div style="font-size:.62rem;color:var(--gris-osc);margin-top:3px;">0.0 – 5.0</div>
+            </div>
+            <div style="text-align:center;min-width:70px;">
+              <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gris-osc);margin-bottom:4px;">Ponderado</div>
+              <span class="pond-val" id="pond_4.2" style="font-size:1.3rem;">—</span>
+              <div style="font-size:.62rem;color:var(--gris-osc);margin-top:2px;">pts pond.</div>
+            </div>
+            <div style="background:var(--amber-clar);border:1px solid var(--amber);border-radius:12px;padding:3px 10px;font-size:.65rem;font-weight:700;color:#7D4E00;">15%</div>
+          </div>
+        </div>
+      </div>
+      <div class="bloque-footer"><span class="footer-label">Subtotal B4 — Examen Final (15% + 15% = 30%)</span><span class="footer-val" id="subval4">—</span></div>
+    </div>
+
+  </section>
+
+  <!-- PANEL RESUMEN -->
+  <div class="resumen-panel">
+    <div class="resumen-bloques">
+      <div class="resumen-blq"><span class="resumen-blq-nota" id="r_b1">—</span><span class="resumen-blq-label">B1 · 30%</span></div>
+      <div class="resumen-sep"></div>
+      <div class="resumen-blq"><span class="resumen-blq-nota" id="r_b2">—</span><span class="resumen-blq-label">B2 · 35%</span></div>
+      <div class="resumen-sep"></div>
+      <div class="resumen-blq"><span class="resumen-blq-nota" id="r_b3">—</span><span class="resumen-blq-label">B3 · 5%</span></div>
+      <div class="resumen-sep"></div>
+      <div class="resumen-blq"><span class="resumen-blq-nota" id="r_b4">—</span><span class="resumen-blq-label">B4 · 30%</span></div>
+    </div>
+    <div class="resumen-total-wrap">
+      <div class="resumen-total-label">Nota Final de Rotación</div>
+      <span class="resumen-total-nota" id="resumenTotal">—</span>
+      <div><span class="resumen-nivel-badge nivel-pend" id="resumenNivel">Pendiente</span></div>
+    </div>
+  </div>
+
+  <!-- RETROALIMENTACIÓN -->
+  <div class="retro-section">
+    <div class="retro-header"><span class="retro-icon">💬</span>Retroalimentación Docente</div>
+    <div class="retro-grid">
+      <div class="retro-field"><label>Fortalezas identificadas durante la rotación</label><textarea placeholder="Describa los aspectos en los que el estudiante demostró dominio o desempeño destacado…"></textarea></div>
+      <div class="retro-field"><label>Áreas de oportunidad y plan de mejora acordado</label><textarea placeholder="Describa las brechas observadas y las estrategias concretas de mejora discutidas con el estudiante…"></textarea></div>
+      <div class="retro-field full"><label>Compromisos del estudiante — incluya acciones concretas y fechas de verificación</label><textarea style="min-height:60px" placeholder="Ej: El estudiante se compromete a practicar la presentación oral de casos clínicos estructurados antes del X de [mes]…"></textarea></div>
+    </div>
+  </div>
+
+
+  <!-- ENVIAR REPORTE & REGISTRAR EN MATRIZ -->
+  <div class="integ-section">
+    <div class="integ-header">
+      <span class="integ-icon">📊</span>
+      Enviar Reporte & Registrar en Matriz de Notas
+    </div>
+    <div class="integ-body">
+      <div class="integ-help">
+        <strong>Cómo funciona:</strong> Al tocar "Enviar reporte" se genera el PDF de la evaluación, se envía al correo del estudiante y al evaluador, y los datos quedan registrados automáticamente en tu Google Sheet (matriz de notas). Requiere configurar el Google Apps Script una sola vez — ver instrucciones abajo.
+      </div>
+
+      <div class="integ-row">
+        <div class="integ-field">
+          <label><span class="integ-dot"></span> Email institucional del estudiante</label>
+          <input type="email" id="emailEstudiante" placeholder="estudiante@umanizales.edu.co">
+        </div>
+        <div class="integ-field">
+          <label><span class="integ-dot"></span> Email del evaluador (copia)</label>
+          <input type="email" id="emailEvaluador" placeholder="jd.serna@umanizales.edu.co">
+        </div>
+      </div>
+
+      <div class="integ-toggle" onclick="toggleConfig()">
+        <span id="toggleIcon">⚙</span> <span id="toggleText">Mostrar configuración</span>
+      </div>
+
+      <div class="integ-config" id="integConfig" style="display:none">
+        <div class="integ-field full">
+          <label>URL del Google Apps Script (Web App)</label>
+          <input type="url" id="gasUrl" value="https://script.google.com/macros/s/AKfycbw9ql7jzvAdPH_safNX49VS4sGLfoZEJFKZ2kN1szXNC2-G8Fg6SXYzw9oO9xd9w8f1/exec">
+          <div class="integ-hint">Pega aquí la URL de tu Web App después de publicar el script. Ver archivo <code>GAS_Script_ECOE.gs</code> adjunto con instrucciones paso a paso.</div>
+        </div>
+        <div class="integ-field full">
+          <label>ID de la Google Sheet (Matriz de notas)</label>
+          <input type="text" id="sheetId" value="1Ir3RHGE4rOYT9Ox9n803dVvakHeA6LIMwPR2prBuN3c">
+          <div class="integ-hint">El ID está en la URL de tu hoja: <code>docs.google.com/spreadsheets/d/<strong>ID_AQUÍ</strong>/edit</code></div>
+        </div>
+      </div>
+
+      <div class="integ-actions">
+        <button class="btn-integ btn-integ-primary" onclick="enviarReporte()">
+          <span>✈</span> Enviar reporte por email + registrar en Sheets
+        </button>
+        <button class="btn-integ btn-integ-secondary" onclick="soloRegistrar()">
+          <span>↓</span> Solo registrar en Sheets
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCIONES -->
+  <div class="acciones">
+    <button class="btn btn-amber" onclick="descargarExcel()">📄 Descargar Excel (.xlsx)</button>
+    <button class="btn btn-secondary" onclick="limpiarFormulario()">↺ Nueva evaluación</button>
+    <button class="btn btn-primary" onclick="window.print()">🖨 Imprimir / PDF</button>
+  </div>
+
+</div>
+
+<script>
+const CRITERIOS = {'1.1':10,'1.2':12,'1.3':8,'2.1':10,'2.2':10,'2.3':8,'2.4':7,'3.1':3,'3.2':2,'4.1':15,'4.2':15};
+const BLOQUES = {1:['1.1','1.2','1.3'],2:['2.1','2.2','2.3','2.4'],3:['3.1','3.2'],4:['4.1','4.2']};
+const notas = {};
+
+// ── CONFIGURACIÓN FIJA (no editable) ──────────────────────────────────────
+const GAS_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbw9ql7jzvAdPH_safNX49VS4sGLfoZEJFKZ2kN1szXNC2-G8Fg6SXYzw9oO9xd9w8f1/exec';
+const SHEET_ID_DEFAULT = '1Ir3RHGE4rOYT9Ox9n803dVvakHeA6LIMwPR2prBuN3c';
+
+function getGasUrl() { return document.getElementById('gasUrl').value.trim() || GAS_URL_DEFAULT; }
+function getSheetId() { return document.getElementById('sheetId').value.trim() || SHEET_ID_DEFAULT; }
+
+function seleccionarNivel(celda, val) {
+  const card = celda.closest('.crit-card');
+  const crit = card.dataset.crit;
+  card.querySelectorAll('.nv').forEach(d => d.classList.remove('selected'));
+  celda.classList.add('selected');
+  card.querySelector('.cal-input').value = val;
+  notas[crit] = val;
+  recalcular();
+}
+
+function actualizarCalificacion(input) {
+  const card = input.closest('.crit-card');
+  const crit = card.dataset.crit;
+  const val = parseFloat(input.value);
+  if (isNaN(val) || input.value === '') {
+    delete notas[crit];
+    card.querySelectorAll('.nv').forEach(d => d.classList.remove('selected'));
+    recalcular(); return;
+  }
+  const v = Math.min(5, Math.max(0, val));
+  notas[crit] = v;
+  card.querySelectorAll('.nv').forEach(d => d.classList.remove('selected'));
+  const sel = v>=4.5?'.n4':v>=3.5?'.n3':v>=3.0?'.n2':'.n1';
+  const el = card.querySelector('.nv'+sel);
+  if (el) el.classList.add('selected');
+  recalcular();
+}
+
+function actualizarDirecto(input) {
+  const crit = input.dataset.critDirect;
+  const val = parseFloat(input.value);
+  if (isNaN(val) || input.value === '') { delete notas[crit]; }
+  else { notas[crit] = Math.min(5, Math.max(0, val)); }
+  recalcular();
+}
+
+function recalcular() {
+  let total = 0, cnt = 0;
+  for (const [c, p] of Object.entries(CRITERIOS)) {
+    const span = document.getElementById('pond_'+c);
+    if (notas[c] !== undefined) {
+      const pond = notas[c]*p/100; total += pond; cnt++;
+      span.textContent = pond.toFixed(2);
+    } else { span.textContent = '—'; }
+  }
+  for (const [blq, crits] of Object.entries(BLOQUES)) {
+    let sub = 0;
+    crits.forEach(c => { if (notas[c]!==undefined) sub += notas[c]*CRITERIOS[c]/100; });
+    const hasSome = crits.some(c => notas[c]!==undefined);
+    document.getElementById('subval'+blq).textContent = hasSome ? sub.toFixed(2) : '—';
+    document.getElementById('sub'+blq).textContent = 'Subtotal: '+(hasSome?sub.toFixed(2):'—');
+    document.getElementById('r_b'+blq).textContent = hasSome ? sub.toFixed(2) : '—';
+  }
+  const nEl=document.getElementById('notaFinal'), niEl=document.getElementById('nivelBadge');
+  const rEl=document.getElementById('resumenTotal'), rnEl=document.getElementById('resumenNivel');
+  if (cnt===0) { nEl.textContent='—'; rEl.textContent='—'; setNivel(niEl,null); setNivel(rnEl,null); return; }
+  nEl.textContent=total.toFixed(2); rEl.textContent=total.toFixed(2);
+  setNivel(niEl,total); setNivel(rnEl,total);
+  nEl.style.color=total>=4.5?'#70AD47':total>=3.5?'#E9A800':total>=3.0?'#ED7D31':'#C0392B';
+}
+
+function setNivel(el, nota) {
+  const isResumen = el.id==='resumenNivel';
+  el.className = isResumen ? 'resumen-nivel-badge' : 'nota-nivel';
+  if (nota===null) { el.className+=' nivel-pend'; el.textContent='Pendiente'; }
+  else if (nota>=4.5) { el.className+=' nivel-sob'; el.textContent='★ Sobresaliente'; }
+  else if (nota>=3.5) { el.className+=' nivel-sat'; el.textContent='✓ Satisfactorio'; }
+  else if (nota>=3.0) { el.className+=' nivel-dev'; el.textContent='△ En Desarrollo'; }
+  else { el.className+=' nivel-no'; el.textContent='✕ No Satisfactorio'; }
+}
+
+function limpiarFormulario(todo=false) {
+  if (!confirm(todo?'¿Limpiar todo el formulario?':'¿Limpiar calificaciones y empezar con nuevo estudiante?')) return;
+  for (const k in notas) delete notas[k];
+  document.querySelectorAll('.cal-input').forEach(i => i.value='');
+  document.querySelectorAll('.nv').forEach(d => d.classList.remove('selected'));
+  recalcular();
+  if (todo) {
+    document.querySelectorAll('.section-ident input,.section-ident select').forEach(i => i.value='');
+    document.querySelectorAll('.retro-field textarea').forEach(t => t.value='');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function mostrarResumen() {
+  const nombre=document.getElementById('nombre').value||'Sin nombre';
+  const semestre=document.getElementById('area').value||'Sin semestre';
+  let nota=0;
+  for (const [c,p] of Object.entries(CRITERIOS)) { if (notas[c]!==undefined) nota+=notas[c]*p/100; }
+  const cnt=Object.keys(notas).length, tot=Object.keys(CRITERIOS).length;
+  let lineas=[`Estudiante: ${nombre}`,`Semestre: ${semestre}`,`Criterios: ${cnt}/${tot}`,''];
+  const nombres={1:'Conocimientos teóricos (30%)',2:'HC y Habilidades (35%)',3:'Profesionalismo (5%)',4:'Examen Final (30%: 15% escrito + 15% simulación)'};
+  for (const [blq,crits] of Object.entries(BLOQUES)) {
+    let sub=0; crits.forEach(c=>{ if(notas[c]!==undefined) sub+=notas[c]*CRITERIOS[c]/100; });
+    lineas.push(`B${blq} — ${nombres[blq]}: ${sub>0?sub.toFixed(2):'—'}`);
+  }
+  lineas.push('',`NOTA FINAL: ${cnt>0?nota.toFixed(2):'—'}`);
+  if(nota>=4.5) lineas.push('Nivel: Sobresaliente');
+  else if(nota>=3.5) lineas.push('Nivel: Satisfactorio');
+  else if(nota>=3.0) lineas.push('Nivel: En Desarrollo');
+  else if(cnt>0) lineas.push('Nivel: No Satisfactorio');
+  alert(lineas.join('\n'));
+}
+
+recalcular();
+
+// ── TOGGLE CONFIGURACIÓN ──────────────────────────────────────────────────
+function toggleConfig() {
+  const cfg = document.getElementById('integConfig');
+  const txt = document.getElementById('toggleText');
+  if (cfg.style.display === 'none') {
+    cfg.style.display = 'flex'; txt.textContent = '▲ Ocultar configuración';
+  } else {
+    cfg.style.display = 'none'; txt.textContent = '▼ Mostrar configuración';
+  }
+}
+
+// ── RECOPILAR DATOS ───────────────────────────────────────────────────────
+function recopilarDatos() {
+  const campos = {
+    nombre: document.getElementById('nombre').value,
+    codigo: document.getElementById('codigo').value,
+    cohorte: document.getElementById('semestre').value,
+    semestre: document.getElementById('area').value,
+    sede: document.getElementById('sede').value,
+    periodo: document.getElementById('periodo').value,
+    fechaInicio: document.getElementById('fechaInicio').value,
+    fechaFin: document.getElementById('fechaFin').value,
+    docente: document.getElementById('docente').value,
+    emailEstudiante: document.getElementById('emailEstudiante').value,
+    emailEvaluador: document.getElementById('emailEvaluador').value,
+  };
+  const criteriosData = {};
+  for (const [c, p] of Object.entries(CRITERIOS)) {
+    criteriosData[c] = { peso: p, nota: notas[c] !== undefined ? notas[c] : null, ponderado: notas[c] !== undefined ? (notas[c]*p/100) : null };
+  }
+  const bloquesData = {};
+  const nombresBlq = {1:'Conocimientos teóricos',2:'HC y Habilidades',3:'Profesionalismo',4:'Quiz Final'};
+  for (const [blq, crits] of Object.entries(BLOQUES)) {
+    let sub = 0;
+    crits.forEach(c => { if (notas[c]!==undefined) sub += notas[c]*CRITERIOS[c]/100; });
+    bloquesData[blq] = { nombre: nombresBlq[blq], subtotal: sub };
+  }
+  let total = 0;
+  for (const [c,p] of Object.entries(CRITERIOS)) { if (notas[c]!==undefined) total += notas[c]*p/100; }
+  let nivel = total>=4.5?'Sobresaliente':total>=3.5?'Satisfactorio':total>=3.0?'En Desarrollo':'No Satisfactorio';
+  return { ...campos, criterios: criteriosData, bloques: bloquesData, notaFinal: total, nivel, fecha: new Date().toISOString() };
+}
+
+// ── ENVIAR REPORTE POR EMAIL + REGISTRAR ──────────────────────────────────
+async function enviarReporte() {
+  const gasUrl = getGasUrl();
+  const sheetId = getSheetId();
+  const data = recopilarDatos();
+  if (!data.nombre) { alert('⚠ Ingresa el nombre del estudiante.'); return; }
+  if (!data.emailEstudiante) { alert('⚠ Ingresa el email del estudiante.'); return; }
+  const payload = { action: 'sendAndRegister', sheetId, ...data };
+  const btn = event.target.closest('.btn-integ');
+  try {
+    btn.textContent = '⏳ Enviando...'; btn.disabled = true;
+    await fetch(gasUrl, { method: 'POST', mode: 'no-cors', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    alert('✅ Solicitud enviada al Google Apps Script.\nVerifica tu Google Sheet y las bandejas de correo.');
+  } catch (err) { alert('❌ Error al conectar con Google Apps Script:\n' + err.message); }
+  btn.innerHTML = '<span>✈</span> Enviar reporte por email + registrar en Sheets'; btn.disabled = false;
+}
+
+// ── SOLO REGISTRAR EN SHEETS ──────────────────────────────────────────────
+async function soloRegistrar() {
+  const gasUrl = getGasUrl();
+  const sheetId = getSheetId();
+  const data = recopilarDatos();
+  if (!data.nombre) { alert('⚠ Ingresa el nombre del estudiante.'); return; }
+  const payload = { action: 'registerOnly', sheetId, ...data };
+  const btn = event.target.closest('.btn-integ');
+  try {
+    btn.textContent = '⏳ Registrando...'; btn.disabled = true;
+    await fetch(gasUrl, { method: 'POST', mode: 'no-cors', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    alert('✅ Datos enviados a la Google Sheet.\nVerifica que la fila se haya creado correctamente.');
+  } catch (err) { alert('❌ Error al conectar:\n' + err.message); }
+  btn.innerHTML = '<span>↓</span> Solo registrar en Sheets'; btn.disabled = false;
+}
+
+// ── DESCARGAR EXCEL (CSV UTF-8) ───────────────────────────────────────────
+function descargarExcel() {
+  const data = recopilarDatos();
+  const critNames = {'1.1':'Fundamentos fisiopatológicos','1.2':'Síndromes y entidades','1.3':'Paraclínicos',
+    '2.1':'Anamnesis','2.2':'Examen físico','2.3':'Integración diagnóstica','2.4':'Procedimientos',
+    '3.1':'Responsabilidad y puntualidad','3.2':'Relaciones interpersonales','4.1':'Examen escrito','4.2':'Examen simulación clínica'};
+  const rows = [
+    ['Rúbrica Estandarizada — Rotaciones Clínicas'],
+    ['Estudiante',data.nombre],['Código',data.codigo],['Cohorte',data.cohorte],
+    ['Semestre',data.semestre],['Sede',data.sede],['Período',data.periodo],['Docente',data.docente],[''],
+    ['Criterio','Peso %','Nota','Ponderado']
+  ];
+  for (const [c,p] of Object.entries(CRITERIOS)) {
+    const n = notas[c]; const pond = n!==undefined?(n*p/100).toFixed(2):'';
+    rows.push([critNames[c]||c, p+'%', n!==undefined?n:'', pond]);
+  }
+  rows.push([''],['NOTA FINAL','','',data.notaFinal.toFixed(2)],['NIVEL','','',data.nivel]);
+  const csv = rows.map(r => r.map(c => '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='Rubrica_'+(data.nombre||'estudiante').replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+</script>
+</body>
+</html>

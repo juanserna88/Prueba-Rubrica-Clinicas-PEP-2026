@@ -757,6 +757,39 @@ function showNotif(type, msg) {
   if (type === 'success') setTimeout(function(){ el.style.display='none'; }, 12000);
 }
 
+// ── ENVIAR VIA FORMULARIO OCULTO (sin CORS) ──────────────────────────────
+function enviarViaForm(gasUrl, payload) {
+  return new Promise(function(resolve) {
+    var id = 'gas_' + Date.now();
+    var iframe = document.createElement('iframe');
+    iframe.name = id;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = gasUrl;
+    form.target = id;
+
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    iframe.onload = function() {
+      setTimeout(function() {
+        try { document.body.removeChild(iframe); } catch(e){}
+        try { document.body.removeChild(form); } catch(e){}
+        resolve(true);
+      }, 1500);
+    };
+
+    form.submit();
+  });
+}
+
 // ── ENVIAR REPORTE POR EMAIL + REGISTRAR ──────────────────────────────────
 async function enviarReporte() {
   const gasUrl = getGasUrl();
@@ -769,10 +802,10 @@ async function enviarReporte() {
   btn.textContent = '⏳ Enviando...'; btn.disabled = true;
   showNotif('loading','⏳ Enviando reporte y registrando en Google Sheets...');
   try {
-    await fetch(gasUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+    await enviarViaForm(gasUrl, payload);
     showNotif('success','✔ Reporte enviado a ' + data.emailEstudiante + ' y registrado en Google Sheets · PDF adjunto ✓');
   } catch (err) {
-    showNotif('error','❌ Error de conexión: ' + err.message);
+    showNotif('error','❌ Error: ' + err.message);
   }
   btn.innerHTML = '<span>✈</span> Enviar reporte por email + registrar en Sheets'; btn.disabled = false;
 }
@@ -788,10 +821,10 @@ async function soloRegistrar() {
   btn.textContent = '⏳ Registrando...'; btn.disabled = true;
   showNotif('loading','⏳ Registrando datos en Google Sheets...');
   try {
-    await fetch(gasUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+    await enviarViaForm(gasUrl, payload);
     showNotif('success','✔ Datos registrados correctamente en Google Sheets');
   } catch (err) {
-    showNotif('error','❌ Error de conexión: ' + err.message);
+    showNotif('error','❌ Error: ' + err.message);
   }
   btn.innerHTML = '<span>↓</span> Solo registrar en Sheets'; btn.disabled = false;
 }
